@@ -1,0 +1,6 @@
+{
+    "$schema": "https://jsr.io/schema/config-file.v1.json",
+    "name": "@gu5/krapi",
+    "version": "0.1.0",
+    "exports": "./dist/index.mjs"
+}
