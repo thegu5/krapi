@@ -1,5 +1,6 @@
 import { z } from "zod";
 import * as schemas from "./schemas.ts";
+import type { Region } from "./consts.ts";
 
 class KrunkerApi {
 	#apiKey;
@@ -89,7 +90,7 @@ class KrunkerApi {
 	 * - Page size is fixed at 10 records
 	 * - Entries are sorted by MMR descending
 	 */
-	async fetchRankedLeaderboard(region: number, page = 1) {
+	async fetchRankedLeaderboard(region: Region, page = 1) {
 		const url = new URL(`https://gapi.svc.krunker.io/api/leaderboard/${region}`);
 		url.searchParams.append("page", page.toString());
 
@@ -133,3 +134,4 @@ class KrunkerApi {
 }
 
 export { KrunkerApi };
+export * from "./consts.ts";
