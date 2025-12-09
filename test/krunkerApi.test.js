@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { before, describe, it } from "node:test";
-import { KrunkerApi } from "../dist/index.mjs";
+import { KrunkerApi } from "../dist/index.js";
 
 describe("KrunkerApi", () => {
 	/** @type {KrunkerApi} */

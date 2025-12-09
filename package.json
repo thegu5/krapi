@@ -3,12 +3,12 @@
 	"version": "0.0.1",
 	"description": "A TypeScript wrapper for the official Krunker API",
 	"type": "module",
-	"main": "./dist/index.mjs",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.mts",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"scripts": {
-		"build": "tsdown",
-		"dev": "tsdown --watch",
+		"build": "tsdown --no-fixed-extension",
+		"dev": "tsdown --watch --no-fixed-extension",
 		"test": "node --test"
 	},
 	"keywords": [],
