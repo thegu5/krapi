@@ -1,8 +1,8 @@
 export enum Region {
-    Unknown,
-    Oceania,
-    Asia,
-    Europe,
-    NorthAmerica,
-    SouthAmerica
+    // Unknown = 0,
+    // Oceania = 1,
+    Asia = 2,
+    Europe = 3,
+    NorthAmerica = 4,
+    // SouthAmerica = 5
 }
