@@ -5,6 +5,9 @@ import * as schemas from "./schemas.ts";
 class KrunkerApi {
 	#apiKey;
 
+	/**
+	 * @param props.apiKey Your API key (starts with `kr_`)
+	 */
 	constructor(props: { apiKey: string }) {
 		this.#apiKey = props.apiKey;
 	}
