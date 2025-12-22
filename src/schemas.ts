@@ -142,29 +142,31 @@ export const InventorySchema = z.array(
 export const MatchHistorySchema = z.object({
 	page: z.number(),
 	per_page: z.number(),
-	matches: z.array(
-		z.object({
-			match_id: z.number(),
-			date: z.string(),
-			map: z.number(),
-			duration: z.number(),
-			season: z.number(),
-			region: z.number(),
-			kills: z.number(),
-			deaths: z.number(),
-			assists: z.number(),
-			score: z.number(),
-			damage_done: z.number(),
-			headshots: z.number(),
-			accuracy: z.number(),
-			objective_score: z.number(),
-			kr: z.number(),
-			victory: z.number(),
-			rounds_won: z.number(),
-			team: z.number(),
-			play_time: z.number(),
-		}),
-	).nullable(),
+	matches: z
+		.array(
+			z.object({
+				match_id: z.number(),
+				date: z.string(),
+				map: z.number(),
+				duration: z.number(),
+				season: z.number(),
+				region: z.number(),
+				kills: z.number(),
+				deaths: z.number(),
+				assists: z.number(),
+				score: z.number(),
+				damage_done: z.number(),
+				headshots: z.number(),
+				accuracy: z.number(),
+				objective_score: z.number(),
+				kr: z.number(),
+				victory: z.number(),
+				rounds_won: z.number(),
+				team: z.number(),
+				play_time: z.number(),
+			}),
+		)
+		.nullable(),
 });
 
 export const PostsSchema = z.object({
@@ -343,32 +345,32 @@ export const MapLeaderboardSchema = z.object({
 });
 
 export const SkinListingsSchema = z.object({
-  /** The skin index queried */
-  skin_index: z.number().int(),
-  
-  /** Total number of active listings */
-  total_listings: z.number().int(),
-  
-  /** Lowest listed price (0 if no listings) */
-  lowest_price: z.number().int(),
-  
-  /** Average sale price from last 7 days */
-  average_price: z.number(),
-  
-  /** Total quantity of this skin in circulation */
-  total_circulating: z.number().int(),
-  
-  /** Paginated list of active listings (sorted by price ascending) */
-  listings: z.array(
-    z.object({
-      /** Listing price in KR */
-      price: z.number().int(),
-      
-      /** Seller's username */
-      seller_name: z.string(),
-      
-      /** When the listing was created */
-      listed_at: z.string(),
-    })
-  ),
+	/** The skin index queried */
+	skin_index: z.number().int(),
+
+	/** Total number of active listings */
+	total_listings: z.number().int(),
+
+	/** Lowest listed price (0 if no listings) */
+	lowest_price: z.number().int(),
+
+	/** Average sale price from last 7 days */
+	average_price: z.number(),
+
+	/** Total quantity of this skin in circulation */
+	total_circulating: z.number().int(),
+
+	/** Paginated list of active listings (sorted by price ascending) */
+	listings: z.array(
+		z.object({
+			/** Listing price in KR */
+			price: z.number().int(),
+
+			/** Seller's username */
+			seller_name: z.string(),
+
+			/** When the listing was created */
+			listed_at: z.string(),
+		}),
+	),
 });

@@ -4,5 +4,5 @@
 	"version": "0.1.2",
 	"exports": "./dist/index.js",
 	"license": "GPL-3.0-only",
-    "exclude": ["!dist"]
+	"exclude": ["!dist"]
 }

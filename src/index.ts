@@ -1,6 +1,6 @@
 import { z } from "zod";
-import * as schemas from "./schemas.ts";
 import type { Region } from "./consts.ts";
+import * as schemas from "./schemas.ts";
 
 class KrunkerApi {
 	#apiKey;
