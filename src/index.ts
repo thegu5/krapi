@@ -42,7 +42,7 @@ class KrunkerApi {
 	 * - Page size is fixed at 10 records
 	 * - Matches are ordered by date descending
 	 */
-	async fetchMatchHistory(playerName: string, page = 1, season: number | undefined = undefined) {
+	async fetchMatchHistory(playerName: string, page = 1, season?: number) {
 		const url = new URL(`https://gapi.svc.krunker.io/api/player/${playerName}/matches`);
 		url.searchParams.append("page", page.toString());
 		if (season) url.searchParams.append("season", season.toString());
