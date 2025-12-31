@@ -12,8 +12,8 @@ class KrunkerApi {
 		this.#apiKey = props.apiKey;
 	}
 
-	async #fetchJson(path: string) {
-		const response = await fetch(path, {
+	async #fetchJson(url: string) {
+		const response = await fetch(url, {
 			headers: {
 				"X-Developer-API-Key": this.#apiKey,
 			},
@@ -27,12 +27,12 @@ class KrunkerApi {
 	}
 
 	async fetchProfile(playerName: string) {
-		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/player/${playerName}`);
+		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}`);
 		return z.parse(schemas.ProfileSchema, data);
 	}
 
 	async fetchInventory(playerName: string) {
-		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/player/${playerName}/inventory`);
+		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}/inventory`);
 		return z.parse(schemas.InventorySchema, data);
 	}
 
@@ -43,7 +43,7 @@ class KrunkerApi {
 	 * - Matches are ordered by date descending
 	 */
 	async fetchMatchHistory(playerName: string, page = 1, season?: number) {
-		const url = new URL(`https://gapi.svc.krunker.io/api/player/${playerName}/matches`);
+		const url = new URL(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}/matches`);
 		url.searchParams.append("page", page.toString());
 		if (season) url.searchParams.append("season", season.toString());
 
@@ -52,7 +52,7 @@ class KrunkerApi {
 	}
 
 	async fetchPosts(playerName: string, page = 1) {
-		const url = new URL(`https://gapi.svc.krunker.io/api/player/${playerName}/posts`);
+		const url = new URL(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}/posts`);
 		url.searchParams.append("page", page.toString());
 
 		const data = await this.#fetchJson(url.toString());
@@ -70,7 +70,7 @@ class KrunkerApi {
 	}
 
 	async fetchClan(clanName: string) {
-		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/clan/${clanName}`);
+		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/clan/${encodeURIComponent(clanName)}`);
 		return z.parse(schemas.ClanSchema, data);
 	}
 
@@ -80,7 +80,7 @@ class KrunkerApi {
 	 * - Members are sorted by role (descending), then by score (descending)
 	 */
 	async fetchClanMembers(clanName: string, page = 1) {
-		const url = new URL(`https://gapi.svc.krunker.io/api/clan/${clanName}/members`);
+		const url = new URL(`https://gapi.svc.krunker.io/api/clan/${encodeURIComponent(clanName)}/members`);
 		url.searchParams.append("page", page.toString());
 
 		const data = await this.#fetchJson(url.toString());
@@ -127,12 +127,29 @@ class KrunkerApi {
 	/**
 	 * Notes:
 	 * - Listings are sorted by price (lowest first)
-	 * - Page size is fixed at 10 records
+	 * - Page size is fixed at 10 records for listings
 	 * - `average_price` is calculated from sales in the last 7 days
+	 * - Owners list shows up to 100 players, sorted by quantity owned (highest first)
+	 * - Banned users are excluded from the owners list
+	 * - `price_history` contains daily averages for days with sales in the last 30 days (useful for charting)
 	 */
 	async fetchListingsForSkin(skinIndex: number) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/market/skin/${skinIndex}`);
 		return z.parse(schemas.SkinListingsSchema, data);
+	}
+
+	async fetchMods(page = 1) {
+		const url = new URL(`https://gapi.svc.krunker.io/api/mods`);
+		url.searchParams.append("page", page.toString());
+
+		const data = await this.#fetchJson(url.toString());
+
+		return z.parse(schemas.ModListSchema, data);
+	}
+
+	async fetchMod(name: string) {
+		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/mods/${encodeURIComponent(name)}`);
+		return z.parse(schemas.ModSchema, data);
 	}
 }
 

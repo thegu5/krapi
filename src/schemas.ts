@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ProfileSchema = z.object({
+export const ProfileSchema = z.strictObject({
 	/** Player's username */
 	player_name: z.string(),
 
@@ -11,75 +11,75 @@ export const ProfileSchema = z.object({
 	verified: z.boolean(),
 
 	/** Player's country flag index */
-	flag: z.number().int(),
+	flag: z.int(),
 
 	/** Array of badge IDs the player has earned */
-	badges: z.array(z.number().int()),
+	badges: z.array(z.int()),
 
 	/** Number of players this player is following */
-	following: z.number().int(),
+	following: z.int(),
 
 	/** Number of players following this player */
-	followers: z.number().int(),
+	followers: z.int(),
 
 	/** Array of ranked profiles for the current season, one per region (only includes regions where player has completed 6+ placement matches) */
 	ranked: z.array(
-		z.object({
+		z.strictObject({
 			/** Region ID */
-			region: z.number().int(),
+			region: z.int(),
 
 			/** Matchmaking rating */
-			mmr: z.number().int(),
+			mmr: z.int(),
 
 			/** Ranked wins in this region */
-			wins: z.number().int(),
+			wins: z.int(),
 
 			/** Ranked losses in this region */
-			losses: z.number().int(),
+			losses: z.int(),
 
 			/** Total kills in ranked matches */
-			kills: z.number().int(),
+			kills: z.int(),
 
 			/** Total deaths in ranked matches */
-			deaths: z.number().int(),
+			deaths: z.int(),
 
 			/** Total assists in ranked matches */
-			assists: z.number().int(),
+			assists: z.int(),
 
 			/** Total score in ranked matches */
-			score: z.number().int(),
+			score: z.int(),
 
 			/** Total damage dealt in ranked matches */
-			damage_done: z.number().int(),
+			damage_done: z.int(),
 
 			/** Total time played in ranked matches (seconds) */
-			time_played: z.number().int(),
+			time_played: z.int(),
 		}),
 	),
 
 	/** Currency balance */
-	kr: z.number().int(),
+	kr: z.int(),
 
 	/** Calculated from score (0.03 × √score, min 1) */
-	level: z.number().int(),
+	level: z.int(),
 
 	/** ELO/Junk rating */
 	junk: z.number(),
 
 	/** Total skin value */
-	inventory: z.number().int(),
+	inventory: z.int(),
 
 	/** Total score */
-	score: z.number().int(),
+	score: z.int(),
 
 	/** Score per kill */
 	spk: z.number(),
 
 	/** Total kills */
-	kills: z.number().int(),
+	kills: z.int(),
 
 	/** Total deaths */
-	deaths: z.number().int(),
+	deaths: z.int(),
 
 	/** Kill/Death ratio */
 	kdr: z.number(),
@@ -88,50 +88,77 @@ export const ProfileSchema = z.object({
 	kpg: z.number(),
 
 	/** Games played */
-	games: z.number().int(),
+	games: z.int(),
 
 	/** Games won */
-	wins: z.number().int(),
+	wins: z.int(),
 
 	/** Games lost (games - wins) */
-	losses: z.number().int(),
+	losses: z.int(),
 
 	/** Total assists */
-	assists: z.number().int(),
+	assists: z.int(),
 
 	/** Melee kills */
-	melees: z.number().int(),
+	melees: z.int(),
 
 	/** Fist kills */
-	beatdowns: z.number().int(),
+	beatdowns: z.int(),
 
 	/** Thrown weapon kills */
-	bullseyes: z.number().int(),
+	bullseyes: z.int(),
 
 	/** Headshot kills */
-	headshots: z.number().int(),
+	headshots: z.int(),
 
 	/** Leg shot kills */
-	legshots: z.number().int(),
+	legshots: z.int(),
 
 	/** Wallbang kills */
-	wallbangs: z.number().int(),
+	wallbangs: z.int(),
 
 	/** Total shots fired */
-	shots: z.number().int(),
+	shots: z.int(),
 
 	/** Shots that connected */
-	hits: z.number().int(),
+	hits: z.int(),
 
 	/** Shots missed (shots - hits) */
-	misses: z.number().int(),
+	misses: z.int(),
 
 	/** Seconds played */
-	time_played: z.number().int(),
+	time_played: z.int(),
+
+	/** Nukes called in */
+	nukes: z.int(),
+
+	/** Airdrops called in */
+	airdrops: z.int(),
+
+	/** Airdrops stolen from enemies */
+	airdrops_stolen: z.int(),
+
+	/** Slimes called in */
+	slimes: z.int(),
+
+	/** Juggernaut killstreaks earned */
+	juggernauts: z.int(),
+
+	/** Enemy juggernauts killed */
+	juggernauts_killed: z.int(),
+
+	/** Warmachines called in */
+	warmachines: z.int(),
+
+	/** Whether the player has been flagged as a cheater */
+	hacker_tagged: z.boolean(),
+
+	/** Account creation date (RFC3339 format) */
+	created_at: z.iso.datetime(),
 });
 
 export const InventorySchema = z.array(
-	z.object({
+	z.strictObject({
 		/** Identifier for the skin */
 		skin_index: z.number(),
 		/** Number owned (excludes market listings) */
@@ -139,12 +166,12 @@ export const InventorySchema = z.array(
 	}),
 );
 
-export const MatchHistorySchema = z.object({
+export const MatchHistorySchema = z.strictObject({
 	page: z.number(),
 	per_page: z.number(),
 	matches: z
 		.array(
-			z.object({
+			z.strictObject({
 				match_id: z.number(),
 				date: z.string(),
 				map: z.number(),
@@ -169,11 +196,11 @@ export const MatchHistorySchema = z.object({
 		.nullable(),
 });
 
-export const PostsSchema = z.object({
+export const PostsSchema = z.strictObject({
 	page: z.number(),
 	per_page: z.number(),
 	posts: z.array(
-		z.object({
+		z.strictObject({
 			date: z.string(),
 			text: z.string(),
 			votes: z.number(),
@@ -182,7 +209,7 @@ export const PostsSchema = z.object({
 	),
 });
 
-export const MatchSchema = z.object({
+export const MatchSchema = z.strictObject({
 	match_id: z.number(),
 	date: z.string(),
 	map: z.number(),
@@ -190,7 +217,7 @@ export const MatchSchema = z.object({
 	season: z.number(),
 	region: z.number(),
 	participants: z.array(
-		z.object({
+		z.strictObject({
 			player_name: z.string(),
 			kills: z.number(),
 			deaths: z.number(),
@@ -208,73 +235,87 @@ export const MatchSchema = z.object({
 	),
 });
 
-export const ClanSchema = z.object({
+export const ClanSchema = z.strictObject({
+	/** Clan name */
 	name: z.string(),
+
+	/** Name of the clan owner */
 	owner_name: z.string(),
+
+	/** Clan's total score */
 	score: z.number(),
+
+	/** Clan's leaderboard rank */
 	rank: z.number(),
+
+	/** Number of members in the clan */
 	member_count: z.number(),
+
+	/** Clan creation date (not rfc-3339, pending a fix) */
 	created_at: z.string(),
+
+	/** Discord invite code (empty string if not set) */
+	discord: z.string(),
 });
 
-export const ClanMembersSchema = z.object({
+export const ClanMembersSchema = z.strictObject({
 	page: z.number(),
 	per_page: z.number(),
-	members: z.array(z.object({ player_name: z.string(), role: z.number() })),
+	members: z.array(z.strictObject({ player_name: z.string(), role: z.number() })),
 });
 
-export const RankedLeaderboardSchema = z.object({
+export const RankedLeaderboardSchema = z.strictObject({
 	/** Current page number */
-	page: z.number().int(),
+	page: z.int(),
 
 	/** Number of entries per page (10) */
-	per_page: z.number().int(),
+	per_page: z.int(),
 
 	/** Current ranked season */
-	season: z.number().int(),
+	season: z.int(),
 
 	/** Region ID */
-	region: z.number().int(),
+	region: z.int(),
 
 	/** Array of leaderboard entries */
 	entries: z.array(
-		z.object({
+		z.strictObject({
 			/** Leaderboard position */
-			position: z.number().int(),
+			position: z.int(),
 
 			/** Player's username */
 			player_name: z.string(),
 
 			/** Matchmaking rating */
-			mmr: z.number().int(),
+			mmr: z.int(),
 
 			/** Total ranked wins */
-			wins: z.number().int(),
+			wins: z.int(),
 
 			/** Total ranked losses */
-			losses: z.number().int(),
+			losses: z.int(),
 
 			/** Total kills in ranked matches */
-			kills: z.number().int(),
+			kills: z.int(),
 
 			/** Total deaths in ranked matches */
-			deaths: z.number().int(),
+			deaths: z.int(),
 
 			/** Total assists in ranked matches */
-			assists: z.number().int(),
+			assists: z.int(),
 
 			/** Total score in ranked matches */
-			score: z.number().int(),
+			score: z.int(),
 
 			/** Total damage dealt in ranked matches */
-			damage_done: z.number().int(),
+			damage_done: z.int(),
 		}),
 	),
 });
 
-export const MapInfoSchema = z.object({
+export const MapInfoSchema = z.strictObject({
 	/** Unique map identifier */
-	map_id: z.number().int(),
+	map_id: z.int(),
 
 	/** Map name */
 	name: z.string(),
@@ -286,16 +327,16 @@ export const MapInfoSchema = z.object({
 	creator_name: z.string(),
 
 	/** Total upvotes */
-	votes: z.number().int(),
+	votes: z.int(),
 
 	/** Number of times the map has been played */
-	gameplays: z.number().int(),
+	gameplays: z.int(),
 
 	/** Total playtime in milliseconds */
-	playtime: z.number().int(),
+	playtime: z.int(),
 
 	/** Map category ID */
-	category: z.number().int(),
+	category: z.int(),
 
 	/** When the map was created */
 	created_at: z.string(),
@@ -307,15 +348,15 @@ export const MapInfoSchema = z.object({
 	leaderboard_type: z.string(),
 
 	/** Sort order for leaderboard (0 = ascending/lower is better, 1 = descending/higher is better) */
-	leaderboard_order: z.number().int(),
+	leaderboard_order: z.int(),
 });
 
-export const MapLeaderboardSchema = z.object({
+export const MapLeaderboardSchema = z.strictObject({
 	/** Current page number */
-	page: z.number().int(),
+	page: z.int(),
 
 	/** Number of entries per page (25) */
-	per_page: z.number().int(),
+	per_page: z.int(),
 
 	/** The map name queried */
 	map_name: z.string(),
@@ -324,19 +365,19 @@ export const MapLeaderboardSchema = z.object({
 	leaderboard_type: z.string(),
 
 	/** Sort order (0 = ascending, 1 = descending) */
-	leaderboard_order: z.number().int(),
+	leaderboard_order: z.int(),
 
 	/** Array of leaderboard entries */
 	entries: z.array(
-		z.object({
+		z.strictObject({
 			/** Leaderboard position */
-			position: z.number().int(),
+			position: z.int(),
 
 			/** Player's username */
 			player_name: z.string(),
 
 			/** Score or time value */
-			value: z.number().int(),
+			value: z.int(),
 
 			/** When the entry was recorded */
 			date: z.string(),
@@ -344,27 +385,27 @@ export const MapLeaderboardSchema = z.object({
 	),
 });
 
-export const SkinListingsSchema = z.object({
+export const SkinListingsSchema = z.strictObject({
 	/** The skin index queried */
-	skin_index: z.number().int(),
+	skin_index: z.int(),
 
 	/** Total number of active listings */
-	total_listings: z.number().int(),
+	total_listings: z.int(),
 
 	/** Lowest listed price (0 if no listings) */
-	lowest_price: z.number().int(),
+	lowest_price: z.int(),
 
 	/** Average sale price from last 7 days */
 	average_price: z.number(),
 
 	/** Total quantity of this skin in circulation */
-	total_circulating: z.number().int(),
+	total_circulating: z.int(),
 
 	/** Paginated list of active listings (sorted by price ascending) */
 	listings: z.array(
-		z.object({
+		z.strictObject({
 			/** Listing price in KR */
-			price: z.number().int(),
+			price: z.int(),
 
 			/** Seller's username */
 			seller_name: z.string(),
@@ -373,4 +414,59 @@ export const SkinListingsSchema = z.object({
 			listed_at: z.string(),
 		}),
 	),
+
+	/** First 100 owners sorted by quantity owned (descending) */
+	owners: z.array(
+		z.strictObject({
+			/** Owner's username */
+			player_name: z.string(),
+
+			/** Number of this skin the player owns */
+			count: z.int(),
+		}),
+	),
+
+	/** Daily average sale prices for the last 30 days */
+	price_history: z.array(
+		z.strictObject({
+			/** Date (YYYY-MM-DD format) */
+			date: z.iso.date(),
+
+			/** Average sale price on that day */
+			average_price: z.number(),
+
+			/** Number of sales on that day */
+			sales: z.int(),
+		}),
+	),
+});
+
+export const ModSchema = z.strictObject({
+	/** Unique mod identifier */
+	mod_id: z.int(),
+	/** Mod name */
+	name: z.string(),
+	/** Mod description */
+	description: z.string(),
+	/** Username of the mod creator */
+	creator_name: z.string(),
+	/** Number of upvotes */
+	votes: z.int(),
+	/** Whether the mod is featured */
+	featured: z.boolean(),
+	/** Mod version number */
+	version: z.int(),
+	/** When the mod was first published (not rfc-3339, pending a fix) */
+	created_at: z.string(),
+	/** When the mod was last updated (not rfc-3339, pending a fix) */
+	updated_at: z.string(),
+});
+
+export const ModListSchema = z.strictObject({
+	/** Current page number */
+	page: z.int(),
+	/** Number of mods per page (10) */
+	per_page: z.int(),
+	/** Array of mod objects sorted by votes (most popular first) */
+	mods: z.array(ModSchema),
 });

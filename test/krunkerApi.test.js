@@ -68,4 +68,14 @@ describe("KrunkerApi", () => {
 			await assert.doesNotReject(api.fetchListingsForSkin(0));
 		});
 	});
+
+	describe("Mod endpoints", () => {
+		it("should fetch popular mods", async () => {
+			await assert.doesNotReject(api.fetchMods());
+		});
+		
+		it("should fetch mod info", async () => {
+			await assert.doesNotReject(api.fetchMod("EchoOfWorlds"))
+		})
+	});
 });

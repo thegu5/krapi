@@ -5,6 +5,7 @@
 		"lib": ["ESNext"],
 		"noEmit": true,
 		"strict": true,
+		"checkJs": true,
 		"allowImportingTsExtensions": true,
 		"rewriteRelativeImportExtensions": true,
 		"verbatimModuleSyntax": true,
