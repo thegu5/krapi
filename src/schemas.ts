@@ -251,8 +251,8 @@ export const ClanSchema = z.strictObject({
 	/** Number of members in the clan */
 	member_count: z.number(),
 
-	/** Clan creation date (not rfc-3339, pending a fix) */
-	created_at: z.string(),
+	/** Clan creation date */
+	created_at: z.iso.datetime(),
 
 	/** Discord invite code (empty string if not set) */
 	discord: z.string(),
@@ -470,3 +470,8 @@ export const ModListSchema = z.strictObject({
 	/** Array of mod objects sorted by votes (most popular first) */
 	mods: z.array(ModSchema),
 });
+
+export const ValidateKrunkScriptSchema = z.union([
+	z.strictObject({ success: z.literal(true) }),
+	z.strictObject({ success: z.literal(false), error: z.string() }),
+]);
