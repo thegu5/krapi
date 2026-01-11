@@ -4,6 +4,11 @@
 
 A TypeScript wrapper for the official Krunker API
 
+## Installation
+
+krapi is available on [JSR][jsr-url]. If you use [pnpm](https://pnpm.io) or [yarn](https://yarnpkg.com) or [deno](https://deno.com), install `jsr:@gu5/krapi`.
+If you use npm, run `npx jsr add @gu5/krapi`.
+
 ## Example
 
 ```ts
