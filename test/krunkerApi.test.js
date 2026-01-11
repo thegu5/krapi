@@ -73,9 +73,15 @@ describe("KrunkerApi", () => {
 		it("should fetch popular mods", async () => {
 			await assert.doesNotReject(api.fetchMods());
 		});
-		
+
 		it("should fetch mod info", async () => {
-			await assert.doesNotReject(api.fetchMod("EchoOfWorlds"))
-		})
+			await assert.doesNotReject(api.fetchMod("EchoOfWorlds"));
+		});
+	});
+
+	describe("Editor endpoints", () => {
+		it("should validate correct krunkscript", async () => {
+			await assert.doesNotReject(api.validateKrunkscript("client", "bool test = true;"));
+		});
 	});
 });

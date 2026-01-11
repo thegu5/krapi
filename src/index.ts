@@ -19,6 +19,8 @@ class KrunkerApi {
 			},
 		});
 		const data = await response.json();
+
+		// TODO: structured error that uses x-retry-after & similar?
 		if (!response.ok) {
 			const errorData = z.parse(z.object({ error: z.string() }), data);
 			throw new Error(`${response.status} ${errorData.error}`);
@@ -118,9 +120,7 @@ class KrunkerApi {
 	 * - Entries are sorted by value according to leaderboard_order
 	 */
 	async fetchMapLeaderboard(mapName: string) {
-		const data = await this.#fetchJson(
-			`https://gapi.svc.krunker.io/api/map/${encodeURIComponent(mapName)}/leaderboard`,
-		);
+		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/map/${encodeURIComponent(mapName)}/leaderboard`);
 		return z.parse(schemas.MapLeaderboardSchema, data);
 	}
 
@@ -150,6 +150,23 @@ class KrunkerApi {
 	async fetchMod(name: string) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/mods/${encodeURIComponent(name)}`);
 		return z.parse(schemas.ModSchema, data);
+	}
+
+	async validateKrunkscript(scriptType: "client" | "server", scriptSource: string) {
+		const response = await fetch(`https://editor.krunker.io/krunkscript/validate/${scriptType}`, {
+			headers: {
+				"X-Developer-API-Key": this.#apiKey,
+				"Content-Type": "text/plain",
+			},
+			method: "POST",
+			body: scriptSource,
+		});
+		const data = await response.json();
+		if (!response.ok) {
+			const errorData = z.parse(z.object({ error: z.string() }), data);
+			throw new Error(`${response.status} ${errorData.error}`);
+		}
+		return z.parse(schemas.ValidateKrunkScriptSchema, data);
 	}
 }
 
