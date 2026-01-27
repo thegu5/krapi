@@ -1,20 +1,32 @@
 {
-	"name": "krapi",
+	"name": "@gu5/krapi",
 	"version": "0.1.6",
-	"description": "A TypeScript wrapper for the official Krunker API",
-	"author": "thegu5",
 	"license": "GPL-3.0-only",
-	"keywords": [],
+	"author": "Gus",
+	"description": "A TypeScript wrapper for the official Krunker API",
+	"homepage": "https://github.com/thegu5/krapi",
+	"bugs": {
+		"url": "https://github.com/thegu5/krapi/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/thegu5/krapi.git"
+	},
 	"type": "module",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"src",
+		"LICENSE",
+		"README.md"
+	],
 	"scripts": {
 		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"test": "node --test"
 	},
-	"packageManager": "pnpm@10.24.0",
 	"dependencies": {
 		"zod": "^4.1.13"
 	},
