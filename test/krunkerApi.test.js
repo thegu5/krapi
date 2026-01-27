@@ -61,6 +61,9 @@ describe("KrunkerApi", () => {
 		it("should fetch map leaderboard", async () => {
 			await assert.doesNotReject(api.fetchMapLeaderboard("Lava_Run"));
 		});
+		it("should fetch map leaderboard entry", async () => {
+			await assert.doesNotReject(api.fetchMapLeaderboardEntry("slide_moonlight", "thegu5"));
+		});
 	});
 
 	describe("Market endpoints", () => {

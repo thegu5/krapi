@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LeaderboardOrder, MatchResult } from "./consts.ts";
 
 export const ProfileSchema = z.strictObject({
 	/** Player's username */
@@ -160,51 +161,52 @@ export const ProfileSchema = z.strictObject({
 export const InventorySchema = z.array(
 	z.strictObject({
 		/** Identifier for the skin */
-		skin_index: z.number(),
+		skin_index: z.int(),
 		/** Number owned (excludes market listings) */
-		count: z.number(),
+		count: z.int(),
 	}),
 );
 
 export const MatchHistorySchema = z.strictObject({
-	page: z.number(),
-	per_page: z.number(),
+	page: z.int(),
+	per_page: z.int(),
 	matches: z
 		.array(
 			z.strictObject({
 				match_id: z.number(),
 				date: z.string(),
-				map: z.number(),
-				duration: z.number(),
-				season: z.number(),
-				region: z.number(),
-				kills: z.number(),
-				deaths: z.number(),
-				assists: z.number(),
-				score: z.number(),
-				damage_done: z.number(),
-				headshots: z.number(),
-				accuracy: z.number(),
-				objective_score: z.number(),
-				kr: z.number(),
-				victory: z.number(),
-				rounds_won: z.number(),
-				team: z.number(),
-				play_time: z.number(),
+				map: z.int(),
+				duration: z.int(),
+				season: z.int(),
+				region: z.int(),
+				kills: z.int(),
+				deaths: z.int(),
+				assists: z.int(),
+				score: z.int(),
+				damage_done: z.int(),
+				headshots: z.int(),
+				accuracy: z.int(),
+				objective_score: z.int(),
+				kr: z.int(),
+				victory: z.enum(MatchResult),
+				rounds_won: z.int(),
+				team: z.int(),
+				play_time: z.int(),
+				mmr: z.int(),
 			}),
 		)
 		.nullable(),
 });
 
 export const PostsSchema = z.strictObject({
-	page: z.number(),
-	per_page: z.number(),
+	page: z.int(),
+	per_page: z.int(),
 	posts: z.array(
 		z.strictObject({
 			date: z.string(),
 			text: z.string(),
-			votes: z.number(),
-			comment_count: z.number(),
+			votes: z.int(),
+			comment_count: z.int(),
 		}),
 	),
 });
@@ -212,25 +214,25 @@ export const PostsSchema = z.strictObject({
 export const MatchSchema = z.strictObject({
 	match_id: z.number(),
 	date: z.string(),
-	map: z.number(),
-	duration: z.number(),
-	season: z.number(),
-	region: z.number(),
+	map: z.int(),
+	duration: z.int(),
+	season: z.int(),
+	region: z.int(),
 	participants: z.array(
 		z.strictObject({
 			player_name: z.string(),
-			kills: z.number(),
-			deaths: z.number(),
-			assists: z.number(),
-			score: z.number(),
-			damage_done: z.number(),
-			headshots: z.number(),
-			accuracy: z.number(),
-			objective_score: z.number(),
-			victory: z.number(),
-			rounds_won: z.number(),
-			team: z.number(),
-			play_time: z.number(),
+			kills: z.int(),
+			deaths: z.int(),
+			assists: z.int(),
+			score: z.int(),
+			damage_done: z.int(),
+			headshots: z.int(),
+			accuracy: z.int(),
+			objective_score: z.int(),
+			victory: z.enum(MatchResult),
+			rounds_won: z.int(),
+			team: z.int(),
+			play_time: z.int(),
 		}),
 	),
 });
@@ -246,10 +248,10 @@ export const ClanSchema = z.strictObject({
 	score: z.number(),
 
 	/** Clan's leaderboard rank */
-	rank: z.number(),
+	rank: z.int(),
 
 	/** Number of members in the clan */
-	member_count: z.number(),
+	member_count: z.int(),
 
 	/** Clan creation date */
 	created_at: z.iso.datetime(),
@@ -259,9 +261,9 @@ export const ClanSchema = z.strictObject({
 });
 
 export const ClanMembersSchema = z.strictObject({
-	page: z.number(),
-	per_page: z.number(),
-	members: z.array(z.strictObject({ player_name: z.string(), role: z.number() })),
+	page: z.int(),
+	per_page: z.int(),
+	members: z.array(z.strictObject({ player_name: z.string(), role: z.int(), verified: z.boolean() })),
 });
 
 export const RankedLeaderboardSchema = z.strictObject({
@@ -348,7 +350,7 @@ export const MapInfoSchema = z.strictObject({
 	leaderboard_type: z.string(),
 
 	/** Sort order for leaderboard (0 = ascending/lower is better, 1 = descending/higher is better) */
-	leaderboard_order: z.int(),
+	leaderboard_order: z.enum(LeaderboardOrder),
 });
 
 export const MapLeaderboardSchema = z.strictObject({
@@ -365,7 +367,7 @@ export const MapLeaderboardSchema = z.strictObject({
 	leaderboard_type: z.string(),
 
 	/** Sort order (0 = ascending, 1 = descending) */
-	leaderboard_order: z.int(),
+	leaderboard_order: z.enum(LeaderboardOrder),
 
 	/** Array of leaderboard entries */
 	entries: z.array(
@@ -383,6 +385,29 @@ export const MapLeaderboardSchema = z.strictObject({
 			date: z.string(),
 		}),
 	),
+});
+
+export const MapLeaderboardEntrySchema = z.strictObject({
+	/** The map name queried */
+	map_name: z.string(),
+
+	/** Type of leaderboard (e.g., "time", "score") */
+	leaderboard_type: z.string(),
+
+	/** Sort order (0 = ascending, 1 = descending) */
+	leaderboard_order: z.enum(LeaderboardOrder),
+
+	/** Player's username */
+	player_name: z.string(),
+
+	/** Player's position on the leaderboard */
+	position: z.int(),
+
+	/** Player's score or time value */
+	value: z.int(),
+
+	/** When the entry was recorded */
+	date: z.string(),
 });
 
 export const SkinListingsSchema = z.strictObject({

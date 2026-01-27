@@ -95,9 +95,10 @@ class KrunkerApi {
 	 * - Page size is fixed at 10 records
 	 * - Entries are sorted by MMR descending
 	 */
-	async fetchRankedLeaderboard(region: Region, page = 1) {
+	async fetchRankedLeaderboard(region: Region, page = 1, season?: number) {
 		const url = new URL(`https://gapi.svc.krunker.io/api/leaderboard/${region}`);
 		url.searchParams.append("page", page.toString());
+		if (season) url.searchParams.append("season", season.toString());
 
 		const data = await this.#fetchJson(url.toString());
 		return z.parse(schemas.RankedLeaderboardSchema, data);
@@ -119,9 +120,24 @@ class KrunkerApi {
 	 * - Page size is fixed at 25 records
 	 * - Entries are sorted by value according to leaderboard_order
 	 */
-	async fetchMapLeaderboard(mapName: string) {
-		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/map/${encodeURIComponent(mapName)}/leaderboard`);
+	async fetchMapLeaderboard(mapName: string, page = 1) {
+		const url = new URL(`https://gapi.svc.krunker.io/api/map/${encodeURIComponent(mapName)}/leaderboard`);
+		url.searchParams.append("page", page.toString());
+
+		const data = await this.#fetchJson(url.toString());
 		return z.parse(schemas.MapLeaderboardSchema, data);
+	}
+
+	/**
+	 * Notes:
+	 * - Returns 404 if the map has no leaderboard or the player has no entry
+	 * - Position is calculated dynamically based on current leaderboard standings
+	 */
+	async fetchMapLeaderboardEntry(mapName: string, playerName: string) {
+		const data = await this.#fetchJson(
+			`https://gapi.svc.krunker.io/api/map/${encodeURIComponent(mapName)}/leaderboard/player/${encodeURIComponent(playerName)}`,
+		);
+		return z.parse(schemas.MapLeaderboardEntrySchema, data);
 	}
 
 	/**
@@ -133,8 +149,12 @@ class KrunkerApi {
 	 * - Banned users are excluded from the owners list
 	 * - `price_history` contains daily averages for days with sales in the last 30 days (useful for charting)
 	 */
-	async fetchListingsForSkin(skinIndex: number) {
-		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/market/skin/${skinIndex}`);
+	async fetchListingsForSkin(skinIndex: number, page = 1, days = 30) {
+		const url = new URL(`https://gapi.svc.krunker.io/api/market/skin/${skinIndex}`);
+		url.searchParams.append("page", page.toString());
+		url.searchParams.append("days", days.toString());
+
+		const data = await this.#fetchJson(url.toString());
 		return z.parse(schemas.SkinListingsSchema, data);
 	}
 
