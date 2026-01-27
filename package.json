@@ -1,6 +1,6 @@
 {
 	"name": "@gu5/krapi",
-	"version": "0.1.6",
+	"version": "0.2.0",
 	"license": "GPL-3.0-only",
 	"author": "Gus",
 	"description": "A TypeScript wrapper for the official Krunker API",
