@@ -27,6 +27,7 @@
 		"dev": "tsdown --watch",
 		"test": "node --test"
 	},
+	"packageManager": "pnpm@10.24.0",
 	"dependencies": {
 		"zod": "^4.1.13"
 	},
