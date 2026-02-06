@@ -156,6 +156,15 @@ export const ProfileSchema = z.strictObject({
 
 	/** Account creation date (RFC3339 format) */
 	created_at: z.iso.datetime(),
+
+	/** Whether the player is a KPD moderator */
+	kpd: z.boolean(),
+
+	/** Whether the player has an active premium subscription */
+	premium: z.boolean(),
+
+	/** Profile picture URL for premium users, empty string otherwise */
+	profile_picture: z.string(),
 });
 
 export const InventorySchema = z.array(
@@ -435,8 +444,8 @@ export const SkinListingsSchema = z.strictObject({
 			/** Seller's username */
 			seller_name: z.string(),
 
-			/** When the listing was created */
-			listed_at: z.string(),
+			/** When the listing was created (rfc-3339 datetime) */
+			listed_at: z.iso.datetime(),
 		}),
 	),
 
@@ -462,6 +471,21 @@ export const SkinListingsSchema = z.strictObject({
 
 			/** Number of sales on that day */
 			sales: z.int(),
+		}),
+	),
+});
+
+export const PlayerListingsSchema = z.strictObject({
+	page: z.int(),
+	per_page: z.int(),
+	listings: z.array(
+		z.strictObject({
+			/** Identifier for the skin being sold */
+			skin_index: z.int(),
+			/** Listing price in KR */
+			price: z.int(),
+			/** When the listing was created (rfc-3339 datetime) */
+			listed_at: z.string(),
 		}),
 	),
 });

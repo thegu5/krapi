@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Region } from "./consts.ts";
 import * as schemas from "./schemas.ts";
 
-class KrunkerApi {
+export class KrunkerApi {
 	#apiKey;
 
 	/**
@@ -31,6 +31,19 @@ class KrunkerApi {
 	async fetchProfile(playerName: string) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}`);
 		return z.parse(schemas.ProfileSchema, data);
+	}
+	
+	/**
+	 * - Only active listings are returned
+	 * - Page size is fixed at 10 records
+	 * - Listings are ordered by date listed (newest first)
+	 */
+	async fetchPlayerListings(playerName: string, page = 1) {
+		const url = new URL(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}/listings`);
+		url.searchParams.append("page", page.toString());
+
+		const data = await this.#fetchJson(url.toString());
+		return z.parse(schemas.PlayerListingsSchema, data);
 	}
 
 	async fetchInventory(playerName: string) {
@@ -190,5 +203,4 @@ class KrunkerApi {
 	}
 }
 
-export { KrunkerApi };
 export * from "./consts.ts";

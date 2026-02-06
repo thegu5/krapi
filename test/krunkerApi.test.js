@@ -18,6 +18,10 @@ describe("KrunkerApi", () => {
 			await assert.doesNotReject(api.fetchProfile("thegu5"));
 		});
 
+		it("should fetch player listings", async () => {
+			await assert.doesNotReject(api.fetchPlayerListings("givetickrate"));
+		})
+
 		it("should fetch player inventory", async () => {
 			await assert.doesNotReject(api.fetchInventory("thegu5"));
 		});
