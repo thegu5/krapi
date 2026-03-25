@@ -8,14 +8,12 @@
 	"bugs": {
 		"url": "https://github.com/thegu5/krapi/issues"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/thegu5/krapi.git"
-	},
+	"repository": "github:thegu5/krapi",
 	"type": "module",
-	"main": "./dist/index.js",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"exports": {
+		"types": "./dist/index.d.ts",
+		"default": "./dist/index.js"
+	},
 	"files": [
 		"dist",
 		"src",
