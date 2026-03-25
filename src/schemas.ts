@@ -169,10 +169,22 @@ export const ProfileSchema = z.strictObject({
 
 export const InventorySchema = z.array(
 	z.strictObject({
-		/** Identifier for the skin */
+		/** Index of the skin in the global skin array */
 		skin_index: z.int(),
+
+		/** Identifier for this specific instance of the skin */
+		skin_id: z.int(),
+
 		/** Number owned (excludes market listings) */
 		count: z.int(),
+
+		metadata: z
+			.strictObject({
+				wear: z.number(),
+			})
+			.nullable(),
+
+		stackable: z.boolean(),
 	}),
 );
 
