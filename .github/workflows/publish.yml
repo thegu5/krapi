@@ -26,5 +26,7 @@ jobs:
         run: pnpm build
       - name: Publish to NPM
         run: pnpm publish
+        continue-on-error: true
       - name: Publish to JSR
         run: pnpx jsr publish
+        continue-on-error: true
