@@ -20,6 +20,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         run: pnpm install
+      - name: Run Biome
+        run: pnpm biome ci
       - name: Build package
         run: pnpm build
       - name: Publish to NPM
