@@ -32,7 +32,7 @@ export class KrunkerApi {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}`);
 		return z.parse(schemas.ProfileSchema, data);
 	}
-	
+
 	/**
 	 * - Only active listings are returned
 	 * - Page size is fixed at 10 records
