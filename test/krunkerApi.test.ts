@@ -1,11 +1,11 @@
 import assert from "node:assert";
 import { before, describe, it } from "node:test";
-import { KrunkerApi, Region } from "../dist/index.js";
+import { Region } from "../src/consts.ts";
+import { KrunkerApi } from "../src/index.ts";
 
 // These tests exist so that it's easy to know when the zod schemas aren't updated to account for new api changes
 describe("KrunkerApi", () => {
-	/** @type {KrunkerApi} */
-	let api;
+	let api: KrunkerApi;
 
 	before(() => {
 		const apiKey = process.env.KRUNKER_API_KEY;
@@ -20,7 +20,7 @@ describe("KrunkerApi", () => {
 
 		it("should fetch player listings", async () => {
 			await assert.doesNotReject(api.fetchPlayerListings("givetickrate"));
-		})
+		});
 
 		it("should fetch player inventory", async () => {
 			await assert.doesNotReject(api.fetchInventory("thegu5"));
