@@ -5,6 +5,9 @@ export const ProfileSchema = z.strictObject({
 	/** Player's username */
 	player_name: z.string(),
 
+	/** Player's ID */
+	player_id: z.int(),
+
 	/** Player's clan name (empty string if not in a clan) */
 	clan: z.string(),
 
