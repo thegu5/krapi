@@ -154,6 +154,25 @@ export const ProfileSchema = z.strictObject({
 	/** Warmachines called in */
 	warmachines: z.int(),
 
+	class_stats: z.strictObject({
+		"0": z.number(),
+		"1": z.number(),
+		"2": z.number(),
+		"3": z.number(),
+		"4": z.number(),
+		"5": z.number(),
+		"6": z.number(),
+		"7": z.number(),
+		"8": z.number(),
+		"9": z.number(),
+		"10": z.number(),
+		"11": z.number(),
+		"12": z.number(),
+		"13": z.number(),
+		"14": z.number(),
+		"15": z.number(),
+	}),
+
 	/** Whether the player has been flagged as a cheater */
 	hacker_tagged: z.boolean(),
 
@@ -168,6 +187,24 @@ export const ProfileSchema = z.strictObject({
 
 	/** Profile picture URL for premium users, empty string otherwise */
 	profile_picture: z.string(),
+
+	twitch_name: z.string(),
+
+	maps: z.array(
+		z.strictObject({
+			id: z.int(),
+			name: z.string(),
+			votes: z.number(),
+		}),
+	),
+
+	mods: z.array(
+		z.strictObject({
+			id: z.int(),
+			name: z.string(),
+			votes: z.number(),
+		}),
+	),
 });
 
 export const InventorySchema = z.array(
@@ -287,7 +324,14 @@ export const ClanSchema = z.strictObject({
 export const ClanMembersSchema = z.strictObject({
 	page: z.int(),
 	per_page: z.int(),
-	members: z.array(z.strictObject({ player_name: z.string(), role: z.int(), verified: z.boolean() })),
+	members: z.array(
+		z.strictObject({
+			player_name: z.string(),
+			score: z.int(),
+			role: z.int(),
+			verified: z.boolean(),
+		}),
+	),
 });
 
 export const RankedLeaderboardSchema = z.strictObject({
@@ -360,6 +404,9 @@ export const MapInfoSchema = z.strictObject({
 
 	/** Total playtime in milliseconds */
 	playtime: z.int(),
+
+	/** If the map is officially featured */
+	featured: z.boolean(),
 
 	/** Map category ID */
 	category: z.int(),
