@@ -30,7 +30,7 @@ export class KrunkerApi {
 
 	async fetchProfile(playerName: string) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}`);
-		return z.parse(schemas.ProfileSchema, data);
+		return schemas.ProfileSchema.parse(data);
 	}
 
 	/**
@@ -43,12 +43,12 @@ export class KrunkerApi {
 		url.searchParams.append("page", page.toString());
 
 		const data = await this.#fetchJson(url.toString());
-		return z.parse(schemas.PlayerListingsSchema, data);
+		schemas.PlayerListingsSchema.parse(data);
 	}
 
 	async fetchInventory(playerName: string) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/player/${encodeURIComponent(playerName)}/inventory`);
-		return z.parse(schemas.InventorySchema, data);
+		schemas.InventorySchema.parse(data);
 	}
 
 	/**
@@ -63,7 +63,7 @@ export class KrunkerApi {
 		if (season) url.searchParams.append("season", season.toString());
 
 		const data = await this.#fetchJson(url.toString());
-		return z.parse(schemas.MatchHistorySchema, data);
+		schemas.MatchHistorySchema.parse(data);
 	}
 
 	async fetchPosts(playerName: string, page = 1) {
@@ -71,7 +71,7 @@ export class KrunkerApi {
 		url.searchParams.append("page", page.toString());
 
 		const data = await this.#fetchJson(url.toString());
-		return z.parse(schemas.PostsSchema, data);
+		return schemas.PostsSchema.parse(data);
 	}
 
 	/**
@@ -81,12 +81,12 @@ export class KrunkerApi {
 	 */
 	async fetchMatch(matchId: number) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/match/${matchId}`);
-		return z.parse(schemas.MatchSchema, data);
+		return schemas.MatchSchema.parse(data);
 	}
 
 	async fetchClan(clanName: string) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/clan/${encodeURIComponent(clanName)}`);
-		return z.parse(schemas.ClanSchema, data);
+		return schemas.ClanSchema.parse(data);
 	}
 
 	/**
@@ -99,7 +99,7 @@ export class KrunkerApi {
 		url.searchParams.append("page", page.toString());
 
 		const data = await this.#fetchJson(url.toString());
-		return z.parse(schemas.ClanMembersSchema, data);
+		return schemas.ClanMembersSchema.parse(data);
 	}
 
 	/**
@@ -114,7 +114,7 @@ export class KrunkerApi {
 		if (season) url.searchParams.append("season", season.toString());
 
 		const data = await this.#fetchJson(url.toString());
-		return z.parse(schemas.RankedLeaderboardSchema, data);
+		return schemas.RankedLeaderboardSchema.parse(data);
 	}
 
 	/**
@@ -124,7 +124,7 @@ export class KrunkerApi {
 	 */
 	async fetchMapInfo(mapName: string) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/map/${encodeURIComponent(mapName)}`);
-		return z.parse(schemas.MapInfoSchema, data);
+		return schemas.MapInfoSchema.parse(data);
 	}
 
 	/**
@@ -138,7 +138,7 @@ export class KrunkerApi {
 		url.searchParams.append("page", page.toString());
 
 		const data = await this.#fetchJson(url.toString());
-		return z.parse(schemas.MapLeaderboardSchema, data);
+		return schemas.MapLeaderboardSchema.parse(data);
 	}
 
 	/**
@@ -150,7 +150,7 @@ export class KrunkerApi {
 		const data = await this.#fetchJson(
 			`https://gapi.svc.krunker.io/api/map/${encodeURIComponent(mapName)}/leaderboard/player/${encodeURIComponent(playerName)}`,
 		);
-		return z.parse(schemas.MapLeaderboardEntrySchema, data);
+		return schemas.MapLeaderboardEntrySchema.parse(data);
 	}
 
 	/**
@@ -168,7 +168,7 @@ export class KrunkerApi {
 		url.searchParams.append("days", days.toString());
 
 		const data = await this.#fetchJson(url.toString());
-		return z.parse(schemas.SkinListingsSchema, data);
+		return schemas.SkinListingsSchema.parse(data);
 	}
 
 	async fetchMods(page = 1) {
@@ -177,12 +177,12 @@ export class KrunkerApi {
 
 		const data = await this.#fetchJson(url.toString());
 
-		return z.parse(schemas.ModListSchema, data);
+		return schemas.ModListSchema.parse(data);
 	}
 
 	async fetchMod(name: string) {
 		const data = await this.#fetchJson(`https://gapi.svc.krunker.io/api/mods/${encodeURIComponent(name)}`);
-		return z.parse(schemas.ModSchema, data);
+		return schemas.ModSchema.parse(data);
 	}
 
 	async validateKrunkscript(scriptType: "client" | "server", scriptSource: string) {
@@ -199,7 +199,7 @@ export class KrunkerApi {
 			const errorData = z.parse(z.object({ error: z.string() }), data);
 			throw new Error(`${response.status} ${errorData.error}`);
 		}
-		return z.parse(schemas.ValidateKrunkScriptSchema, data);
+		return schemas.ValidateKrunkScriptSchema.parse(data);
 	}
 }
 

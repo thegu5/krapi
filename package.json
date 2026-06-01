@@ -8,7 +8,10 @@
 	"bugs": {
 		"url": "https://github.com/thegu5/krapi/issues"
 	},
-	"repository": "github:thegu5/krapi",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/thegu5/krapi.git"
+	},
 	"type": "module",
 	"exports": {
 		"types": "./dist/index.d.ts",
@@ -27,12 +30,12 @@
 	},
 	"packageManager": "pnpm@11.5.0",
 	"dependencies": {
-		"zod": "^4.3.6"
+		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.4.13",
-		"@types/node": "^25.6.0",
-		"tsdown": "^0.21.10",
+		"@biomejs/biome": "2.4.16",
+		"@types/node": "^25.9.1",
+		"tsdown": "^0.22.1",
 		"typescript": "^6.0.3"
 	}
 }
