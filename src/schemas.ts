@@ -221,7 +221,18 @@ export const InventorySchema = z.array(
 		metadata: z
 			.strictObject({
 				wear: z.number(),
+				style: z.number(),
+				serial: z.number(),
+
+				// kounter stats
+				kills: z.number(),
+				hskills: z.number(),
+				headshots: z.number(),
+				hits: z.number(),
+				shots: z.number(),
+				jumps: z.number(),
 			})
+			.partial()
 			.nullable(),
 
 		stackable: z.boolean(),
