@@ -134,22 +134,24 @@ export class KrunkerApi {
 	 * - Poll every 20-60 seconds; if `has_more` is true, fetch the next page right away
 	 * - Events appear a few seconds after they happen; ids only increase, gaps are normal
 	 */
-	async fetchEvents(props: {
-		/** Event id cursor (default 0) */
-		after?: number;
+	async fetchEvents(
+		props: {
+			/** Event id cursor (default 0) */
+			after?: number;
 
-		/** Event types to return (default: all your scopes allow) */
-		types?: string[];
+			/** Event types to return (default: all your scopes allow) */
+			types?: string[];
 
-		/** Only events about this kind of target, e.g. "map" */
-		targetType?: string;
+			/** Only events about this kind of target, e.g. "map" */
+			targetType?: string;
 
-		/** Target ids, up to 100 (needs `targetType`) */
-		targetIds?: Array<number | string>;
+			/** Target ids, up to 100 (needs `targetType`) */
+			targetIds?: Array<number | string>;
 
-		/** Maximum number of events to return (1-100, default 100) */
-		limit?: number;
-	} = {}) {
+			/** Maximum number of events to return (1-100, default 100) */
+			limit?: number;
+		} = {},
+	) {
 		const url = new URL("https://gapi.svc.krunker.io/api/events");
 		if (props.after !== undefined) url.searchParams.append("after", props.after.toString());
 		if (props.types) url.searchParams.append("types", props.types.join(","));

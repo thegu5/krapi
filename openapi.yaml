@@ -1,0 +1,1585 @@
+# OpenAPI spec is based off schemas from https://npmx.dev/@gu5/krapi.
+openapi: 3.2.1
+
+info:
+  title: Krunker API
+  version: 0.3.4
+  summary: Official Krunker game API
+  description: |
+    HTTP API for Krunker.io player, match, clan, map, market and mod data.
+
+    All requests must include a developer API key (starts with `kr_`) in the
+    `X-Developer-API-Key` header. Non-2xx responses return an `Error` object.
+
+servers:
+  - url: https://gapi.svc.krunker.io/api
+    description: Production Server
+  - url: https://gapi.beta.krunker.io/api
+    description: Beta Server
+
+
+tags:
+  - name: players
+    summary: Players
+    description: Profiles, inventories, listings, match history and posts
+    kind: nav
+  - name: player-listings
+    summary: Player Listings
+    description: Market listings created by a player
+    parent: players
+  - name: matches
+    summary: Matches
+    kind: nav
+  - name: clans
+    summary: Clans
+    kind: nav
+  - name: ranked
+    summary: Ranked
+    kind: nav
+  - name: maps
+    summary: Maps
+    kind: nav
+  - name: market
+    summary: Market
+    kind: nav
+  - name: events
+    summary: Events
+    description: Pollable feed of things that happened, newest last
+    kind: nav
+  - name: mods
+    summary: Mods
+    kind: nav
+
+security:
+  - developerApiKey: []
+
+paths:
+  /player/{playerName}:
+    get:
+      operationId: fetchProfile
+      tags: [players]
+      summary: Get a player profile
+      description: Includes lifetime stats, current-season ranked profiles and the player's voted maps/mods.
+      parameters:
+        - $ref: '#/components/parameters/PlayerName'
+      responses:
+        '200':
+          description: Player profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /player/{playerName}/inventory:
+    get:
+      operationId: fetchInventory
+      tags: [players]
+      summary: Get a player's skin inventory
+      parameters:
+        - $ref: '#/components/parameters/PlayerName'
+      responses:
+        '200':
+          description: Player's skins
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /player/{playerName}/listings:
+    get:
+      operationId: fetchPlayerListings
+      tags: [player-listings]
+      summary: Get a player's market listings
+      description: |
+        Only active listings are returned.
+        Page size is fixed at 10 records.
+        Listings are ordered by date listed (newest first).
+      parameters:
+        - $ref: '#/components/parameters/PlayerName'
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Paginated market listings created by the player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerListings'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /player/{playerName}/matches:
+    get:
+      operationId: fetchMatchHistory
+      tags: [players]
+      summary: Get a player's match history
+      description: |
+        Only ranked matches are returned.
+        Page size is fixed at 10 records.
+        Matches are ordered by date descending.
+      parameters:
+        - $ref: '#/components/parameters/PlayerName'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Season'
+      responses:
+        '200':
+          description: Paginated ranked match history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchHistory'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /player/{playerName}/posts:
+    get:
+      operationId: fetchPosts
+      tags: [players]
+      summary: Get a player's profile posts
+      parameters:
+        - $ref: '#/components/parameters/PlayerName'
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Paginated profile posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Posts'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /match/{matchId}:
+    get:
+      operationId: fetchMatch
+      tags: [matches]
+      summary: Get a ranked match by ID
+      description: |
+        Only ranked matches are returned.
+        Participants are ordered by team, then by score descending.
+      parameters:
+        - $ref: '#/components/parameters/MatchId'
+      responses:
+        '200':
+          description: Match details with participants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /clan/{clanName}:
+    get:
+      operationId: fetchClan
+      tags: [clans]
+      summary: Get a clan
+      parameters:
+        - $ref: '#/components/parameters/ClanName'
+      responses:
+        '200':
+          description: Clan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clan'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /clan/{clanName}/members:
+    get:
+      operationId: fetchClanMembers
+      tags: [clans]
+      summary: Get a clan's members
+      description: |
+        Page size is fixed at 10 records.
+        Members are sorted by role (descending), then by score (descending).
+      parameters:
+        - $ref: '#/components/parameters/ClanName'
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Paginated clan members
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClanMembers'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /leaderboard/{region}:
+    get:
+      operationId: fetchRankedLeaderboard
+      tags: [ranked]
+      summary: Get the ranked leaderboard for a region
+      description: |
+        Only players with 6+ completed placement matches appear on the leaderboard.
+        Page size is fixed at 10 records.
+        Entries are sorted by MMR descending.
+      parameters:
+        - $ref: '#/components/parameters/Region'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Season'
+      responses:
+        '200':
+          description: Paginated ranked leaderboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RankedLeaderboard'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /map/{mapName}:
+    get:
+      operationId: fetchMapInfo
+      tags: [maps]
+      summary: Get map info
+      description: |
+        Returns 404 if the map is not found or is restricted/deleted.
+        Map name is case-sensitive.
+      parameters:
+        - $ref: '#/components/parameters/MapName'
+      responses:
+        '200':
+          description: Map details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapInfo'
+        '404':
+          $ref: '#/components/responses/MapNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /map/{mapName}/leaderboard:
+    get:
+      operationId: fetchMapLeaderboard
+      tags: [maps]
+      summary: Get a map's leaderboard
+      description: |
+        Returns an empty entries array if the map has no leaderboard configured.
+        Page size is fixed at 25 records.
+        Entries are sorted by value according to leaderboard_order.
+      parameters:
+        - $ref: '#/components/parameters/MapName'
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Paginated map leaderboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapLeaderboard'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /map/{mapName}/leaderboard/player/{playerName}:
+    get:
+      operationId: fetchMapLeaderboardEntry
+      tags: [maps]
+      summary: Get a player's entry on a map leaderboard
+      description: |
+        Returns 404 if the map has no leaderboard or the player has no entry.
+        Position is calculated dynamically based on current leaderboard standings.
+      parameters:
+        - $ref: '#/components/parameters/MapName'
+        - $ref: '#/components/parameters/PlayerName'
+      responses:
+        '200':
+          description: The player's leaderboard entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapLeaderboardEntry'
+        '404':
+          $ref: '#/components/responses/MapNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /maps/featured:
+    get:
+      operationId: fetchFeaturedMaps
+      tags: [maps]
+      summary: Get Featured Maps
+      description: |
+        List every map that is currently featured, newest first.
+        Use Get Map by Name for a map's details.
+        To be told when a map is featured or unfeatured, use Events.
+      responses:
+        '200':
+          description: Featured maps with the number of maps returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturedMaps'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events:
+    get:
+      operationId: fetchEvents
+      tags: [events]
+      summary: List Events
+      description: |
+        Returns events newer than `after`, oldest first.
+        Store `next` and pass it as `after` on your next call.
+        Start with `after=0`.
+        Keep the same filters between calls; `next` also moves past events your filters skipped, so changing filters later does not bring those back.
+
+        Rate limit: 6 requests per minute per key, on top of the general limit.
+        The `X-RateLimit-*` headers on this endpoint describe this 6-per-minute limit.
+        Poll every 20-60 seconds; if `has_more` is true, fetch the next page right away.
+
+        Events appear a few seconds after they happen.
+        Ids only increase; gaps are normal.
+      parameters:
+        - name: after
+          in: query
+          description: Event id cursor (default 0)
+          schema:
+            type: integer
+            default: 0
+        - name: types
+          in: query
+          description: Comma-separated event types to return (default all your scopes allow), e.g. `map.featured,map.unfeatured`
+          schema:
+            type: string
+        - name: target_type
+          in: query
+          description: Only events about this kind of target, e.g. `map`
+          schema:
+            type: string
+        - name: target_id
+          in: query
+          description: Comma-separated target ids, up to 100 (needs `target_type`), e.g. `8497,8500`
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of events to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 100
+      responses:
+        '200':
+          description: Events with the cursor for the next page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Events'
+        '429':
+          description: Rate limit exceeded (6 requests per minute for this endpoint, on top of the general limit)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /market/skin/{skinIndex}:
+    get:
+      operationId: fetchListingsForSkin
+      tags: [market]
+      summary: Get market data for a skin
+      description: |
+        Listings are sorted by price (lowest first).
+        Page size is fixed at 10 records for listings.
+        `average_price` is calculated from sales in the last 7 days.
+        Owners list shows up to 100 players, sorted by quantity owned (highest first).
+        Banned users are excluded from the owners list.
+        `price_history` contains daily averages for days with sales in the last 30 days.
+      parameters:
+        - $ref: '#/components/parameters/SkinIndex'
+        - $ref: '#/components/parameters/Page'
+        - name: days
+          in: query
+          description: Number of days of price history to return
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Skin market data with listings, owners and price history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkinListings'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /mods:
+    get:
+      operationId: fetchMods
+      tags: [mods]
+      summary: List mods
+      description: Page size is fixed at 10 records, sorted by votes (most popular first).
+      parameters:
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Paginated mod list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModList'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /mods/{modName}:
+    get:
+      operationId: fetchMod
+      tags: [mods]
+      summary: Get a mod by name
+      parameters:
+        - name: modName
+          in: path
+          required: true
+          description: Mod name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mod details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mod'
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    developerApiKey:
+      type: apiKey
+      in: header
+      name: X-Developer-API-Key
+      description: Developer API key (starts with `kr_`)
+
+  parameters:
+    PlayerName:
+      name: playerName
+      in: path
+      required: true
+      description: Player's username
+      schema:
+        type: string
+    ClanName:
+      name: clanName
+      in: path
+      required: true
+      description: Clan name
+      schema:
+        type: string
+    MapName:
+      name: mapName
+      in: path
+      required: true
+      description: Map name (case-sensitive)
+      schema:
+        type: string
+    MatchId:
+      name: matchId
+      in: path
+      required: true
+      description: Match ID
+      schema:
+        type: number
+    SkinIndex:
+      name: skinIndex
+      in: path
+      required: true
+      description: Index of the skin in the global skin array
+      schema:
+        type: integer
+    Page:
+      name: page
+      in: query
+      description: Page number
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    Season:
+      name: season
+      in: query
+      description: Ranked season (defaults to the current season)
+      schema:
+        type: integer
+    Region:
+      name: region
+      in: path
+      required: true
+      description: |-
+        Region ID:
+        * `2` - Asia
+        * `3` - Europe
+        * `4` - North America
+      schema:
+        type: integer
+        enum: [2, 3, 4]
+
+  responses:
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    MapNotFound:
+      description: Map not found, restricted or deleted (or no leaderboard entry for the player)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    MatchResult:
+      type: integer
+      description: |-
+        Match outcome for the player's team:
+        * `-1` - Draw
+        * `0` - Loss
+        * `1` - Win
+      enum: [-1, 0, 1]
+
+    LeaderboardOrder:
+      type: integer
+      description: |-
+        Leaderboard sort order:
+        * `0` - Ascending (lower is better)
+        * `1` - Descending (higher is better)
+      enum: [0, 1]
+
+    RankedProfile:
+      type: object
+      additionalProperties: false
+      description: Per-region ranked stats for the current season (only includes regions where the player has completed 6+ placement matches)
+      required: [region, mmr, wins, losses, kills, deaths, assists, score, damage_done, time_played]
+      properties:
+        region:
+          type: integer
+          description: Region ID
+        mmr:
+          type: integer
+          description: Matchmaking rating
+        wins:
+          type: integer
+          description: Ranked wins in this region
+        losses:
+          type: integer
+          description: Ranked losses in this region
+        kills:
+          type: integer
+          description: Total kills in ranked matches
+        deaths:
+          type: integer
+          description: Total deaths in ranked matches
+        assists:
+          type: integer
+          description: Total assists in ranked matches
+        score:
+          type: integer
+          description: Total score in ranked matches
+        damage_done:
+          type: integer
+          description: Total damage dealt in ranked matches
+        time_played:
+          type: integer
+          description: Total time played in ranked matches (seconds)
+
+    ClassStats:
+      type: object
+      additionalProperties: false
+      description: Score per class, keyed by class ID (`0`-`15`)
+      required: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
+      properties:
+        '0': { type: number }
+        '1': { type: number }
+        '2': { type: number }
+        '3': { type: number }
+        '4': { type: number }
+        '5': { type: number }
+        '6': { type: number }
+        '7': { type: number }
+        '8': { type: number }
+        '9': { type: number }
+        '10': { type: number }
+        '11': { type: number }
+        '12': { type: number }
+        '13': { type: number }
+        '14': { type: number }
+        '15': { type: number }
+
+    VotedItem:
+      type: object
+      additionalProperties: false
+      description: A map or mod the player has voted on
+      required: [id, name, votes]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        votes:
+          type: number
+
+    Profile:
+      type: object
+      additionalProperties: false
+      required:
+        - player_name
+        - player_id
+        - clan
+        - verified
+        - flag
+        - badges
+        - following
+        - followers
+        - ranked
+        - kr
+        - level
+        - junk
+        - inventory
+        - score
+        - spk
+        - kills
+        - deaths
+        - kdr
+        - kpg
+        - games
+        - wins
+        - losses
+        - assists
+        - melees
+        - beatdowns
+        - bullseyes
+        - headshots
+        - legshots
+        - wallbangs
+        - shots
+        - hits
+        - misses
+        - time_played
+        - nukes
+        - airdrops
+        - airdrops_stolen
+        - slimes
+        - juggernauts
+        - juggernauts_killed
+        - warmachines
+        - class_stats
+        - hacker_tagged
+        - created_at
+        - kpd
+        - premium
+        - profile_picture
+        - twitch_name
+        - maps
+        - mods
+      properties:
+        player_name:
+          type: string
+          description: Player's username
+        player_id:
+          type: integer
+          description: Player's ID
+        clan:
+          type: string
+          description: Player's clan name (empty string if not in a clan)
+        verified:
+          type: boolean
+          description: Whether the player is verified
+        flag:
+          type: integer
+          description: Player's country flag index
+        badges:
+          type: array
+          description: Array of badge IDs the player has earned
+          items:
+            type: integer
+        following:
+          type: integer
+          description: Number of players this player is following
+        followers:
+          type: integer
+          description: Number of players following this player
+        ranked:
+          type: array
+          description: Ranked profiles for the current season, one per region
+          items:
+            $ref: '#/components/schemas/RankedProfile'
+        kr:
+          type: integer
+          description: Currency balance
+        level:
+          type: integer
+          description: Calculated from score (0.03 × √score, min 1)
+        junk:
+          type: number
+          description: ELO/Junk rating
+        inventory:
+          type: integer
+          description: Total skin value
+        score:
+          type: integer
+          description: Total score
+        spk:
+          type: number
+          description: Score per kill
+        kills:
+          type: integer
+          description: Total kills
+        deaths:
+          type: integer
+          description: Total deaths
+        kdr:
+          type: number
+          description: Kill/Death ratio
+        kpg:
+          type: number
+          description: Kills per game
+        games:
+          type: integer
+          description: Games played
+        wins:
+          type: integer
+          description: Games won
+        losses:
+          type: integer
+          description: Games lost (games - wins)
+        assists:
+          type: integer
+          description: Total assists
+        melees:
+          type: integer
+          description: Melee kills
+        beatdowns:
+          type: integer
+          description: Fist kills
+        bullseyes:
+          type: integer
+          description: Thrown weapon kills
+        headshots:
+          type: integer
+          description: Headshot kills
+        legshots:
+          type: integer
+          description: Leg shot kills
+        wallbangs:
+          type: integer
+          description: Wallbang kills
+        shots:
+          type: integer
+          description: Total shots fired
+        hits:
+          type: integer
+          description: Shots that connected
+        misses:
+          type: integer
+          description: Shots missed (shots - hits)
+        time_played:
+          type: integer
+          description: Seconds played
+        nukes:
+          type: integer
+          description: Nukes called in
+        airdrops:
+          type: integer
+          description: Airdrops called in
+        airdrops_stolen:
+          type: integer
+          description: Airdrops stolen from enemies
+        slimes:
+          type: integer
+          description: Slimes called in
+        juggernauts:
+          type: integer
+          description: Juggernaut killstreaks earned
+        juggernauts_killed:
+          type: integer
+          description: Enemy juggernauts killed
+        warmachines:
+          type: integer
+          description: Warmachines called in
+        class_stats:
+          $ref: '#/components/schemas/ClassStats'
+        hacker_tagged:
+          type: boolean
+          description: Whether the player has been flagged as a cheater
+        created_at:
+          type: string
+          format: date-time
+          description: Account creation date (RFC3339 format)
+        kpd:
+          type: boolean
+          description: Whether the player is a KPD moderator
+        premium:
+          type: boolean
+          description: Whether the player has an active premium subscription
+        profile_picture:
+          type: string
+          description: Profile picture URL for premium users, empty string otherwise
+        twitch_name:
+          type: string
+        maps:
+          type: array
+          description: Maps the player has voted on
+          items:
+            $ref: '#/components/schemas/VotedItem'
+        mods:
+          type: array
+          description: Mods the player has voted on
+          items:
+            $ref: '#/components/schemas/VotedItem'
+
+    InventoryItemMetadata:
+      type: object
+      additionalProperties: false
+      description: Skin instance metadata (kounter stats and float data); all fields optional
+      properties:
+        wear:
+          type: number
+        style:
+          type: number
+        serial:
+          type: number
+        kills:
+          type: number
+          description: Kounter stat
+        hskills:
+          type: number
+          description: Kounter stat
+        headshots:
+          type: number
+          description: Kounter stat
+        hits:
+          type: number
+          description: Kounter stat
+        shots:
+          type: number
+          description: Kounter stat
+        jumps:
+          type: number
+          description: Kounter stat
+
+    InventoryItem:
+      type: object
+      additionalProperties: false
+      required: [skin_index, skin_id, count, metadata, stackable]
+      properties:
+        skin_index:
+          type: integer
+          description: Index of the skin in the global skin array
+        skin_id:
+          type: integer
+          description: Identifier for this specific instance of the skin
+        count:
+          type: integer
+          description: Number owned (excludes market listings)
+        metadata:
+          description: Skin instance metadata, null if none
+          oneOf:
+            - $ref: '#/components/schemas/InventoryItemMetadata'
+            - type: 'null'
+        stackable:
+          type: boolean
+
+    Inventory:
+      type: array
+      items:
+        $ref: '#/components/schemas/InventoryItem'
+
+    MatchHistoryEntry:
+      type: object
+      additionalProperties: false
+      required:
+        - match_id
+        - date
+        - map
+        - duration
+        - season
+        - region
+        - kills
+        - deaths
+        - assists
+        - score
+        - damage_done
+        - headshots
+        - accuracy
+        - objective_score
+        - kr
+        - victory
+        - rounds_won
+        - team
+        - play_time
+        - mmr
+      properties:
+        match_id:
+          type: number
+        date:
+          type: string
+        map:
+          type: integer
+        duration:
+          type: integer
+        season:
+          type: integer
+        region:
+          type: integer
+        kills:
+          type: integer
+        deaths:
+          type: integer
+        assists:
+          type: integer
+        score:
+          type: integer
+        damage_done:
+          type: integer
+        headshots:
+          type: integer
+        accuracy:
+          type: integer
+        objective_score:
+          type: integer
+        kr:
+          type: integer
+          description: KR earned from the match
+        victory:
+          $ref: '#/components/schemas/MatchResult'
+        rounds_won:
+          type: integer
+        team:
+          type: integer
+        play_time:
+          type: integer
+        mmr:
+          type: integer
+
+    MatchHistory:
+      type: object
+      additionalProperties: false
+      required: [page, per_page, matches]
+      properties:
+        page:
+          type: integer
+        per_page:
+          type: integer
+        matches:
+          description: Match entries, null if the page is out of range
+          oneOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/MatchHistoryEntry'
+            - type: 'null'
+
+    Post:
+      type: object
+      additionalProperties: false
+      required: [date, text, votes, comment_count]
+      properties:
+        date:
+          type: string
+        text:
+          type: string
+        votes:
+          type: integer
+        comment_count:
+          type: integer
+
+    Posts:
+      type: object
+      additionalProperties: false
+      required: [page, per_page, posts]
+      properties:
+        page:
+          type: integer
+        per_page:
+          type: integer
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+
+    MatchParticipant:
+      type: object
+      additionalProperties: false
+      required:
+        - player_name
+        - kills
+        - deaths
+        - assists
+        - score
+        - damage_done
+        - headshots
+        - accuracy
+        - objective_score
+        - victory
+        - rounds_won
+        - team
+        - play_time
+      properties:
+        player_name:
+          type: string
+        kills:
+          type: integer
+        deaths:
+          type: integer
+        assists:
+          type: integer
+        score:
+          type: integer
+        damage_done:
+          type: integer
+        headshots:
+          type: integer
+        accuracy:
+          type: integer
+        objective_score:
+          type: integer
+        victory:
+          $ref: '#/components/schemas/MatchResult'
+        rounds_won:
+          type: integer
+        team:
+          type: integer
+        play_time:
+          type: integer
+
+    Match:
+      type: object
+      additionalProperties: false
+      required: [match_id, date, map, duration, season, region, participants]
+      properties:
+        match_id:
+          type: number
+        date:
+          type: string
+        map:
+          type: integer
+        duration:
+          type: integer
+        season:
+          type: integer
+        region:
+          type: integer
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchParticipant'
+
+    Clan:
+      type: object
+      additionalProperties: false
+      required: [name, owner_name, score, rank, member_count, created_at, discord]
+      properties:
+        name:
+          type: string
+          description: Clan name
+        owner_name:
+          type: string
+          description: Name of the clan owner
+        score:
+          type: number
+          description: Clan's total score
+        rank:
+          type: integer
+          description: Clan's leaderboard rank
+        member_count:
+          type: integer
+          description: Number of members in the clan
+        created_at:
+          type: string
+          format: date-time
+          description: Clan creation date
+        discord:
+          type: string
+          description: Discord invite code (empty string if not set)
+
+    ClanMember:
+      type: object
+      additionalProperties: false
+      required: [player_name, score, role, verified]
+      properties:
+        player_name:
+          type: string
+        score:
+          type: integer
+        role:
+          type: integer
+        verified:
+          type: boolean
+
+    ClanMembers:
+      type: object
+      additionalProperties: false
+      required: [page, per_page, members]
+      properties:
+        page:
+          type: integer
+        per_page:
+          type: integer
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClanMember'
+
+    RankedLeaderboardEntry:
+      type: object
+      additionalProperties: false
+      required: [position, player_name, mmr, wins, losses, kills, deaths, assists, score, damage_done]
+      properties:
+        position:
+          type: integer
+          description: Leaderboard position
+        player_name:
+          type: string
+          description: Player's username
+        mmr:
+          type: integer
+          description: Matchmaking rating
+        wins:
+          type: integer
+          description: Total ranked wins
+        losses:
+          type: integer
+          description: Total ranked losses
+        kills:
+          type: integer
+          description: Total kills in ranked matches
+        deaths:
+          type: integer
+          description: Total deaths in ranked matches
+        assists:
+          type: integer
+          description: Total assists in ranked matches
+        score:
+          type: integer
+          description: Total score in ranked matches
+        damage_done:
+          type: integer
+          description: Total damage dealt in ranked matches
+
+    RankedLeaderboard:
+      type: object
+      additionalProperties: false
+      required: [page, per_page, season, region, entries]
+      properties:
+        page:
+          type: integer
+          description: Current page number
+        per_page:
+          type: integer
+          description: Number of entries per page (10)
+        season:
+          type: integer
+          description: Current ranked season
+        region:
+          type: integer
+          description: Region ID
+        entries:
+          type: array
+          description: Array of leaderboard entries
+          items:
+            $ref: '#/components/schemas/RankedLeaderboardEntry'
+
+    MapInfo:
+      type: object
+      additionalProperties: false
+      required:
+        - map_id
+        - name
+        - description
+        - creator_name
+        - votes
+        - gameplays
+        - playtime
+        - featured
+        - category
+        - created_at
+        - updated_at
+        - leaderboard_type
+        - leaderboard_order
+      properties:
+        map_id:
+          type: integer
+          description: Unique map identifier
+        name:
+          type: string
+          description: Map name
+        description:
+          type: string
+          description: Map description
+        creator_name:
+          type: string
+          description: Username of the map creator
+        votes:
+          type: integer
+          description: Total upvotes
+        gameplays:
+          type: integer
+          description: Number of times the map has been played
+        playtime:
+          type: integer
+          description: Total playtime in milliseconds
+        featured:
+          type: boolean
+          description: If the map is officially featured
+        category:
+          type: integer
+          description: Map category ID
+        created_at:
+          type: string
+          description: When the map was created
+        updated_at:
+          type: string
+          description: When the map was last updated
+        leaderboard_type:
+          type: string
+          description: Type of leaderboard (e.g. "time", "score", empty if none)
+        leaderboard_order:
+          $ref: '#/components/schemas/LeaderboardOrder'
+
+    MapLeaderboardEntryData:
+      type: object
+      additionalProperties: false
+      required: [position, player_name, value, date]
+      properties:
+        position:
+          type: integer
+          description: Leaderboard position
+        player_name:
+          type: string
+          description: Player's username
+        value:
+          type: integer
+          description: Score or time value
+        date:
+          type: string
+          description: When the entry was recorded
+
+    MapLeaderboard:
+      type: object
+      additionalProperties: false
+      required: [page, per_page, map_name, leaderboard_type, leaderboard_order, entries]
+      properties:
+        page:
+          type: integer
+          description: Current page number
+        per_page:
+          type: integer
+          description: Number of entries per page (25)
+        map_name:
+          type: string
+          description: The map name queried
+        leaderboard_type:
+          type: string
+          description: Type of leaderboard (e.g. "time", "score")
+        leaderboard_order:
+          $ref: '#/components/schemas/LeaderboardOrder'
+        entries:
+          type: array
+          description: Array of leaderboard entries
+          items:
+            $ref: '#/components/schemas/MapLeaderboardEntryData'
+
+    MapLeaderboardEntry:
+      type: object
+      additionalProperties: false
+      required: [map_name, leaderboard_type, leaderboard_order, player_name, position, value, date]
+      properties:
+        map_name:
+          type: string
+          description: The map name queried
+        leaderboard_type:
+          type: string
+          description: Type of leaderboard (e.g. "time", "score")
+        leaderboard_order:
+          $ref: '#/components/schemas/LeaderboardOrder'
+        player_name:
+          type: string
+          description: Player's username
+        position:
+          type: integer
+          description: Player's position on the leaderboard
+        value:
+          type: integer
+          description: Player's score or time value
+        date:
+          type: string
+          description: When the entry was recorded
+
+    FeaturedMap:
+      type: object
+      additionalProperties: false
+      required: [map_id, name, creator_id, creator_name]
+      properties:
+        map_id:
+          type: integer
+          description: Unique map identifier
+        name:
+          type: string
+          description: Map name
+        creator_id:
+          type: integer
+          description: Player id of the map creator
+        creator_name:
+          type: string
+          description: Username of the map creator
+
+    FeaturedMaps:
+      type: object
+      additionalProperties: false
+      required: [maps, count]
+      properties:
+        maps:
+          type: array
+          description: Featured maps, newest first
+          items:
+            $ref: '#/components/schemas/FeaturedMap'
+        count:
+          type: integer
+          description: Number of maps returned
+
+    EventTarget:
+      type: object
+      additionalProperties: false
+      required: [type, id]
+      properties:
+        type:
+          type: string
+          description: Kind of target (e.g. "map")
+        id:
+          type: integer
+          description: Target id
+
+    MapEventData:
+      type: object
+      additionalProperties: false
+      description: Payload for `map.featured` and `map.unfeatured` events
+      required: [map_id, map_name, creator]
+      properties:
+        map_id:
+          type: integer
+          description: Featured map's ID
+        map_name:
+          type: string
+          description: Featured map's name
+        creator:
+          type: string
+          description: Username of the map creator
+
+    Event:
+      type: object
+      additionalProperties: false
+      required: [id, type, created_at, target, data]
+      properties:
+        id:
+          type: integer
+          description: Event id (only increases; gaps are normal)
+        type:
+          type: string
+          description: Event type (e.g. "map.featured", "map.unfeatured")
+        created_at:
+          type: string
+          format: date-time
+          description: When the event happened
+        target:
+          $ref: '#/components/schemas/EventTarget'
+        data:
+          description: Type-specific payload (typed for map.featured/map.unfeatured)
+          oneOf:
+            - $ref: '#/components/schemas/MapEventData'
+            - type: object
+              description: Payload for event types without a documented shape
+              additionalProperties: {}
+
+    Events:
+      type: object
+      additionalProperties: false
+      required: [events, next, has_more]
+      properties:
+        events:
+          type: array
+          description: Events newer than `after`, oldest first
+          items:
+            $ref: '#/components/schemas/Event'
+        next:
+          type: integer
+          description: Cursor to pass as `after` on the next call
+        has_more:
+          type: boolean
+          description: Whether more events are available right away
+
+    SkinListing:
+      type: object
+      additionalProperties: false
+      required: [price, seller_name, listed_at]
+      properties:
+        price:
+          type: integer
+          description: Listing price in KR
+        seller_name:
+          type: string
+          description: Seller's username
+        listed_at:
+          type: string
+          format: date-time
+          description: When the listing was created (RFC3339)
+
+    SkinOwner:
+      type: object
+      additionalProperties: false
+      required: [player_name, count]
+      properties:
+        player_name:
+          type: string
+          description: Owner's username
+        count:
+          type: integer
+          description: Number of this skin the player owns
+
+    SkinPricePoint:
+      type: object
+      additionalProperties: false
+      required: [date, average_price, sales]
+      properties:
+        date:
+          type: string
+          format: date
+          description: Date (YYYY-MM-DD format)
+        average_price:
+          type: number
+          description: Average sale price on that day
+        sales:
+          type: integer
+          description: Number of sales on that day
+
+    SkinListings:
+      type: object
+      additionalProperties: false
+      required: [skin_index, total_listings, lowest_price, average_price, total_circulating, listings, owners, price_history]
+      properties:
+        skin_index:
+          type: integer
+          description: The skin index queried
+        total_listings:
+          type: integer
+          description: Total number of active listings
+        lowest_price:
+          type: integer
+          description: Lowest listed price (0 if no listings)
+        average_price:
+          type: number
+          description: Average sale price from last 7 days
+        total_circulating:
+          type: integer
+          description: Total quantity of this skin in circulation
+        listings:
+          type: array
+          description: Paginated list of active listings (sorted by price ascending)
+          items:
+            $ref: '#/components/schemas/SkinListing'
+        owners:
+          type: array
+          description: First 100 owners sorted by quantity owned (descending)
+          items:
+            $ref: '#/components/schemas/SkinOwner'
+        price_history:
+          type: array
+          description: Daily average sale prices for the last 30 days
+          items:
+            $ref: '#/components/schemas/SkinPricePoint'
+
+    PlayerListing:
+      type: object
+      additionalProperties: false
+      required: [skin_index, price, listed_at]
+      properties:
+        skin_index:
+          type: integer
+          description: Identifier for the skin being sold
+        price:
+          type: integer
+          description: Listing price in KR
+        listed_at:
+          type: string
+          description: When the listing was created
+
+    PlayerListings:
+      type: object
+      additionalProperties: false
+      required: [page, per_page, listings]
+      properties:
+        page:
+          type: integer
+        per_page:
+          type: integer
+        listings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlayerListing'
+
+    Mod:
+      type: object
+      additionalProperties: false
+      required: [mod_id, name, description, creator_name, votes, featured, version, created_at, updated_at]
+      properties:
+        mod_id:
+          type: integer
+          description: Unique mod identifier
+        name:
+          type: string
+          description: Mod name
+        description:
+          type: string
+          description: Mod description
+        creator_name:
+          type: string
+          description: Username of the mod creator
+        votes:
+          type: integer
+          description: Number of upvotes
+        featured:
+          type: boolean
+          description: Whether the mod is featured
+        version:
+          type: integer
+          description: Mod version number
+        created_at:
+          type: string
+          description: When the mod was first published (not RFC3339, pending a fix)
+        updated_at:
+          type: string
+          description: When the mod was last updated (not RFC3339, pending a fix)
+
+    ModList:
+      type: object
+      additionalProperties: false
+      required: [page, per_page, mods]
+      properties:
+        page:
+          type: integer
+          description: Current page number
+        per_page:
+          type: integer
+          description: Number of mods per page (10)
+        mods:
+          type: array
+          description: Array of mod objects sorted by votes (most popular first)
+          items:
+            $ref: '#/components/schemas/Mod'
