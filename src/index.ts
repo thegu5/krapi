@@ -118,6 +118,50 @@ export class KrunkerApi {
 	}
 
 	/**
+	 * - Lists every map that is currently featured, newest first
+	 * - Use {@link KrunkerApi.fetchMapInfo} for a map's details
+	 */
+	async fetchFeaturedMaps() {
+		const data = await this.#fetchJson("https://gapi.svc.krunker.io/api/maps/featured");
+		return schemas.FeaturedMapsSchema.parse(data);
+	}
+
+	/**
+	 * - Returns events newer than `after`, oldest first
+	 * - Store `next` and pass it as `after` on your next call (start with `after = 0`)
+	 * - Keep the same filters between calls; `next` also moves past events your filters skipped, so changing filters later does not bring those back
+	 * - Rate limit: 6 requests per minute per key, on top of the general limit (see the X-RateLimit-* response headers)
+	 * - Poll every 20-60 seconds; if `has_more` is true, fetch the next page right away
+	 * - Events appear a few seconds after they happen; ids only increase, gaps are normal
+	 */
+	async fetchEvents(props: {
+		/** Event id cursor (default 0) */
+		after?: number;
+
+		/** Event types to return (default: all your scopes allow) */
+		types?: string[];
+
+		/** Only events about this kind of target, e.g. "map" */
+		targetType?: string;
+
+		/** Target ids, up to 100 (needs `targetType`) */
+		targetIds?: Array<number | string>;
+
+		/** Maximum number of events to return (1-100, default 100) */
+		limit?: number;
+	} = {}) {
+		const url = new URL("https://gapi.svc.krunker.io/api/events");
+		if (props.after !== undefined) url.searchParams.append("after", props.after.toString());
+		if (props.types) url.searchParams.append("types", props.types.join(","));
+		if (props.targetType) url.searchParams.append("target_type", props.targetType);
+		if (props.targetIds) url.searchParams.append("target_id", props.targetIds.join(","));
+		if (props.limit !== undefined) url.searchParams.append("limit", props.limit.toString());
+
+		const data = await this.#fetchJson(url.toString());
+		return schemas.EventsSchema.parse(data);
+	}
+
+	/**
 	 * Notes:
 	 * - Returns 404 if map not found or is restricted/deleted
 	 * - Map name is case-sensitive

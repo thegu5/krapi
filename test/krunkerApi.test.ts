@@ -68,6 +68,10 @@ describe("KrunkerApi", () => {
 		it("should fetch map leaderboard entry", async () => {
 			await assert.doesNotReject(api.fetchMapLeaderboardEntry("slide_moonlight", "thegu5"));
 		});
+
+		it("should fetch featured maps", async () => {
+			await assert.doesNotReject(api.fetchFeaturedMaps());
+		});
 	});
 
 	describe("Market endpoints", () => {
@@ -83,6 +87,12 @@ describe("KrunkerApi", () => {
 
 		it("should fetch mod info", async () => {
 			await assert.doesNotReject(api.fetchMod("EchoOfWorlds"));
+		});
+	});
+
+	describe("Event endpoints", () => {
+		it("should fetch events", async () => {
+			await assert.doesNotReject(api.fetchEvents({ after: 0, limit: 1 }));
 		});
 	});
 

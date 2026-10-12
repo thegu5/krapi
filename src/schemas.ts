@@ -492,6 +492,74 @@ export const MapLeaderboardEntrySchema = z.strictObject({
 	date: z.string(),
 });
 
+export const FeaturedMapsSchema = z.strictObject({
+	/** Featured maps, newest first */
+	maps: z.array(
+		z.strictObject({
+			/** Unique map identifier */
+			map_id: z.int(),
+
+			/** Map name */
+			name: z.string(),
+
+			/** Player id of the map creator */
+			creator_id: z.int(),
+
+			/** Username of the map creator */
+			creator_name: z.string(),
+		}),
+	),
+
+	/** Number of maps returned */
+	count: z.int(),
+});
+
+/** Payload for `map.featured` and `map.unfeatured` events */
+export const MapEventDataSchema = z.strictObject({
+	/** Featured map's ID */
+	map_id: z.int(),
+
+	/** Featured map's name */
+	map_name: z.string(),
+
+	/** Username of the map creator */
+	creator: z.string(),
+});
+
+export const EventSchema = z.strictObject({
+	/** Event id (only increases; gaps are normal) */
+	id: z.int(),
+
+	/** Event type (e.g. "map.featured", "map.unfeatured") */
+	type: z.string(),
+
+	/** When the event happened */
+	created_at: z.iso.datetime(),
+
+	/** The target the event is about */
+	target: z.strictObject({
+		/** Kind of target (e.g. "map") */
+		type: z.string(),
+
+		/** Target id */
+		id: z.int(),
+	}),
+
+	/** Type-specific payload (typed for map.featured/map.unfeatured) */
+	data: z.union([MapEventDataSchema, z.record(z.string(), z.unknown())]),
+});
+
+export const EventsSchema = z.strictObject({
+	/** Events newer than `after`, oldest first */
+	events: z.array(EventSchema),
+
+	/** Cursor to pass as `after` on the next call */
+	next: z.int(),
+
+	/** Whether more events are available right away */
+	has_more: z.boolean(),
+});
+
 export const SkinListingsSchema = z.strictObject({
 	/** The skin index queried */
 	skin_index: z.int(),
